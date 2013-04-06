@@ -267,6 +267,178 @@ function(module, unit, EventStream){
 			}
 			eval(t.TEST("t.unify(even, [0, 2, 4, 6, 8, 10, 12, 14, 16, 18])"));
 			eval(t.TEST("t.unify(odd,  [1, 3, 5, 7, 9, 11, 13, 15, 17, 19])"));
+		},
+		{
+			test: function test_release_b_with_stop(t){
+				var a = new EventStream(),
+					b = a.attach(function(value){
+							t.info("callback 1: " + value);
+							return value + "-b";
+						}, null, function(value){
+							t.info("stopback 1");
+							eval(t.TEST("value === b"));
+							return value;
+						});
+				b.attach(function(value){
+					t.info("callback 2: " + value);
+					return value + "-b";
+				}, null, function(value){
+					t.info("stopback 2");
+					eval(t.TEST("value === b"));
+					return value;
+				});
+				t.info("send value");
+				a.send("value");
+				t.info("releasing b");
+				b.release();
+				a.send("new value");
+			},
+			logs: [
+				{text: "send value"},
+				{text: "callback 1: value"},
+				{text: "callback 2: value-b"},
+				{text: "releasing b"},
+				{text: "stopback 1"},
+				{text: "stopback 2"}
+			]
+		},
+		{
+			test: function test_release_c_with_stop(t){
+				var a = new EventStream(),
+					b = a.attach(function(value){
+							t.info("callback 1: " + value);
+							return value + "-b";
+						}, null, function(value){
+							t.info("stopback 1");
+							return value;
+						}),
+					c = b.attach(function(value){
+							t.info("callback 2: " + value);
+							return value + "-c";
+						}, null, function(value){
+							t.info("stopback 2");
+							eval(t.TEST("value === c"));
+							return value;
+						});
+				t.info("send value");
+				a.send("value");
+				t.info("releasing c");
+				c.release();
+				a.send("new value");
+			},
+			logs: [
+				{text: "send value"},
+				{text: "callback 1: value"},
+				{text: "callback 2: value-b"},
+				{text: "releasing c"},
+				{text: "stopback 2"},
+				{text: "callback 1: new value"}
+			]
+		},
+		{
+			test: function test_stop_a(t){
+				var a = new EventStream(),
+					b = new EventStream(function(value){
+							t.info("callback 1: " + value);
+							return value + "-b";
+						}, null, function(value){
+							t.info("stopback 1: " + value);
+							return value + "-b";
+						}),
+					c = new EventStream(function(value){
+							t.info("callback 2: " + value);
+							return value + "-c";
+						}, null, function(value){
+							t.info("stopback 2: " + value);
+							return value + "-c";
+						});
+				a.attach(b);
+				b.attach(c);
+				t.info("send value");
+				a.send("value");
+				t.info("stop a");
+				a.stop("stop");
+			},
+			logs: [
+				{text: "send value"},
+				{text: "callback 1: value"},
+				{text: "callback 2: value-b"},
+				{text: "stop a"},
+				{text: "stopback 1: stop"},
+				{text: "stopback 2: stop-b"}
+			]
+		},
+		{
+			test: function test_stop_b(t){
+				var a = new EventStream(),
+					b = new EventStream(function(value){
+							t.info("callback 1: " + value);
+							return value + "-b";
+						}, null, function(value){
+							t.info("stopback 1: " + value);
+							return value + "-b";
+						}),
+					c = new EventStream(function(value){
+							t.info("callback 2: " + value);
+							return value + "-c";
+						}, null, function(value){
+							t.info("stopback 2: " + value);
+							return value + "-c";
+						});
+				a.attach(b);
+				b.attach(c);
+				t.info("send value");
+				a.send("value");
+				t.info("stop b");
+				b.stop("stop");
+				t.info("send new value");
+				a.send("new value");
+			},
+			logs: [
+				{text: "send value"},
+				{text: "callback 1: value"},
+				{text: "callback 2: value-b"},
+				{text: "stop b"},
+				{text: "stopback 1: stop"},
+				{text: "stopback 2: stop-b"},
+				{text: "send new value"}
+			]
+		},
+		{
+			test: function test_stop_c(t){
+				var a = new EventStream(),
+					b = new EventStream(function(value){
+							t.info("callback 1: " + value);
+							return value + "-b";
+						}, null, function(value){
+							t.info("stopback 1: " + value);
+							return value + "-b";
+						}),
+					c = new EventStream(function(value){
+							t.info("callback 2: " + value);
+							return value + "-c";
+						}, null, function(value){
+							t.info("stopback 2: " + value);
+							return value + "-c";
+						});
+				a.attach(b);
+				b.attach(c);
+				t.info("send value");
+				a.send("value");
+				t.info("stop c");
+				c.stop("stop");
+				t.info("send new value");
+				a.send("new value");
+			},
+			logs: [
+				{text: "send value"},
+				{text: "callback 1: value"},
+				{text: "callback 2: value-b"},
+				{text: "stop c"},
+				{text: "stopback 2: stop"},
+				{text: "send new value"},
+				{text: "callback 1: new value"}
+			]
 		}
 	]);
 
