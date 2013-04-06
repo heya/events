@@ -186,6 +186,87 @@ function(module, unit, EventStream){
 				{text: "chan2: new value-2"},
 				{text: "callback 2: new value-a"}
 			]
+		},
+		// EventStream-specific tests
+		{
+			test: function test_attach_streams(t){
+				var a = new EventStream(function(value, sink){
+							t.info("callback 1: " + value);
+							sink.send(value + "-a");
+							sink.sendToChannel("special", value + "-b");
+							return value + "-c";
+						}),
+					b = new EventStream(function(value){
+							t.info("callback 2: " + value);
+							return value + "-d";
+						}),
+					c = new EventStream(function(value){
+							t.info("callback 3: " + value);
+							return value + "-e";
+						});
+				a.attach(b);
+				a.attach("special", c);
+				t.info("sending value");
+				a.send("value");
+			},
+			logs: [
+				{text: "sending value"},
+				{text: "callback 1: value"},
+				{text: "callback 2: value-a"},
+				{text: "callback 3: value-b"},
+				{text: "callback 2: value-c"}
+			]
+		},
+		{
+			test: function test_errors(t){
+				var a = new EventStream();
+				a.attach(function(value){
+					t.info("callback 1: " + value);
+					throw new Error(value + "-err");
+				}, function(value){
+					t.info("errback 1: " + value);
+				}).attach(function(value){
+					t.info("callback 2: " + value);
+				}, function(value){
+					eval(t.TEST("value instanceof Error"));
+					t.info("errback 2: " + value.message);
+					return value.message + "-2";
+				}).attach(function(value){
+					t.info("callback 3: " + value);
+				}, function(value){
+					t.info("errback 3: " + value);
+				});
+				t.info("sending value");
+				a.send("value");
+			},
+			logs: [
+				{text: "sending value"},
+				{text: "callback 1: value"},
+				{text: "errback 2: value-err"},
+				{text: "callback 3: value-err-2"}
+			]
+		},
+		function test_partitioning(t){
+			function captureEventStream(array){
+				return function(value){
+					array.push(value);
+					return value;
+				}
+			}
+			var a = new EventStream(function partition(value, sink){
+						if(value % 2){
+							return sink.sendToChannel("odd", value);
+						}
+						return value; // even
+					}),
+				even = [], odd = [];
+			a.attach(captureEventStream(even));
+			a.attach("odd", captureEventStream(odd));
+			for(var i = 0; i < 20; ++i){
+				a.send(i);
+			}
+			eval(t.TEST("t.unify(even, [0, 2, 4, 6, 8, 10, 12, 14, 16, 18])"));
+			eval(t.TEST("t.unify(odd,  [1, 3, 5, 7, 9, 11, 13, 15, 17, 19])"));
 		}
 	]);
 
