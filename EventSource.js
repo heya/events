@@ -16,20 +16,21 @@
 	EventSource.Value = Value;
 	EventSource.ErrorValue = ErrorValue;
 	EventSource.Stop = Stop;
+	EventSource.makeMultiplexer = makeMultiplexer;
 
 	EventSource.prototype = {
 		declaredClass: "events/EventSource",
 		attach: function attach(channelName, callback, errback, stopback){
 			return new EventSource(typeof channelName == "string" ?
-				this.micro.attach(channelName, makeMultiplexer(callback, errback, stopback)) :
-				this.micro.attach("default", makeMultiplexer(channelName, callback, errback)));
+				this.micro.attach(channelName,
+					EventSource.makeMultiplexer(callback, errback, stopback)) :
+				this.micro.attach("default",
+					EventSource.makeMultiplexer(channelName, callback, errback)));
 		},
 		release: function release(){
 			this.micro.release();
 		}
 	};
-
-	EventSource.prototype.destroy = EventSource.prototype.release;
 
 	return EventSource;
 
