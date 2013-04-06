@@ -1,0 +1,30 @@
+{
+  "name": "heya-events",
+  "version": "0.1.0",
+  "description": "Events.",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "heya-ice": ">=0.1"
+  },
+  "devDependencies": {
+    "heya-unit": ">=0.1"
+  },
+  "scripts": {
+    "test": "node tests/tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/heya/events.git"
+  },
+  "keywords": [
+    "asynchronous",
+    "event",
+    "events",
+    "event-driven programming",
+    "EDP"
+  ],
+  "author": "Eugene Lazutkin <eugene.lazutkin@gmail.com> (http://lazutkin.com/)",
+  "license": "BSD"
+}
