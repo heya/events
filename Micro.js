@@ -16,15 +16,11 @@
 		declaredClass: "events/Micro",
 		noValue: noValue,
 		attach: function attach(channelName, callback){
-			if(typeof channelName != "string"){
-				callback = channelName;
-				channelName = "default";
-			}
 			var micro = new Micro(callback);
-			if(!this.channels.hasOwnProperty(channelName)){
-				this.channels[channelName] = [micro];
-			}else{
+			if(this.channels.hasOwnProperty(channelName)){
 				this.channels[channelName].push(micro);
+			}else{
+				this.channels[channelName] = [micro];
 			}
 			micro.parentChannel = this.channels[channelName];
 			return micro;
