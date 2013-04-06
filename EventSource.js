@@ -10,6 +10,9 @@
 		this.micro = micro || new Micro();
 		this.sink = this.micro.sink;
 		this.micro.sink = makeSink(this);
+		if(!micro){
+			this.micro.callback = defaultCallback(this.micro);
+		}
 	}
 
 	EventSource.noValue = Micro.noValue;
@@ -21,40 +24,46 @@
 	EventSource.prototype = {
 		declaredClass: "events/EventSource",
 		attach: function attach(channelName, callback, errback, stopback){
-			return new EventSource(typeof channelName == "string" ?
-				this.micro.attach(channelName,
-					EventSource.makeMultiplexer(callback, errback, stopback)) :
-				this.micro.attach("default",
-					EventSource.makeMultiplexer(channelName, callback, errback)));
+			if(typeof channelName != "string"){
+				stopback = errback, errback = callback,
+				callback = channelName, channelName = "default";
+			}
+			if(callback instanceof EventSource){
+				this.micro.attach(channelName, callback.micro);
+				return callback;
+			}
+			var es = new EventSource(this.micro.attach(channelName));
+			es.micro.callback = EventSource.makeMultiplexer(es, callback, errback, stopback);
+			return es;
 		},
 		release: function release(){
 			this.micro.release();
+			var channels = this.micro.channels, value = new Stop(this), ch;
+			this.micro.send(value, true);
+			for(ch in channels){
+				if(ch != "default" && channels.hasOwnProperty(ch)){
+					this.sink.send(ch, value, true);
+				}
+			}
 		}
 	};
 
 	return EventSource;
 
-	function makeMultiplexer(callback, errback, stopback){
+	function makeMultiplexer(source, callback, errback, stopback){
 		callback = typeof callback == "function" && callback;
 		errback  = typeof errback  == "function" && errback;
 		stopback = typeof stopback == "function" && stopback;
 		return function(val, sink){
 			try{
-				if(val instanceof Value){
-					if(callback){
-						val = callback(val.x, sink);
-						val = val === Micro.noValue ? val : new Value(val);
-					}
-					return val;
-				}
-				if(val instanceof ErrorValue){
-					if(errback){
-						val = errback(val.x, sink);
-						val = val === Micro.noValue ? val : new Value(val);
-					}
-					return val;
-				}
-				if(val instanceof Stop){
+				if(callback && val instanceof Value){
+					val = callback(val.x, sink);
+					val = val === Micro.noValue ? val : new Value(val);
+				}else if(errback && val instanceof ErrorValue){
+					val = errback(val.x, sink);
+					val = val === Micro.noValue ? val : new Value(val);
+				}else if(val instanceof Stop){
+					source.micro.release();
 					if(stopback){
 						val = stopback(val.x, sink);
 						val = val === Micro.noValue ? val : new Stop(val);
@@ -67,27 +76,36 @@
 		};
 	}
 
-	function makeSink(stream){
+	function makeSink(source){
 		return {
 			send: function send(value){
-				return stream.sink.send("default", new Value(value));
+				return source.sink.send("default", new Value(value));
 			},
 			sendError: function sendError(value){
-				return stream.sink.send("default", new ErrorValue(value));
+				return source.sink.send("default", new ErrorValue(value));
 			},
 			stop: function stop(value){
-				return stream.sink.send("default", new Stop(value));
+				return source.sink.send("default", new Stop(value), true);
 			},
 			sendToChannel: function sendToChannel(channelName, value){
-				return stream.sink.send(channelName, new Value(value));
+				return source.sink.send(channelName, new Value(value));
 			},
 			sendErrorToChannel: function sendErrorToChannel(channelName, value){
-				return stream.sink.send(channelName, new ErrorValue(value));
+				return source.sink.send(channelName, new ErrorValue(value));
 			},
 			stopChannel: function stopChannel(channelName, value){
-				return stream.sink.send(channelName, new Stop(value));
+				return source.sink.send(channelName, new Stop(value), true);
 			},
 			noValue: EventSource.noValue
 		}
+	}
+
+	function defaultCallback(micro){
+		return function(val){
+			if(val instanceof Stop){
+				micro.release();
+			}
+			return val;
+		};
 	}
 });
