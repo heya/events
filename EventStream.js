@@ -18,7 +18,7 @@
 		this.micro.send(new Value(value));
 	};
 	EventStream.prototype.sendError = function sendError(value){
-		this.micro.send(new Error(value));
+		this.micro.send(new ErrorValue(value));
 	};
 	EventStream.prototype.stop = function stop(value){
 		this.micro.send(new Stop(value), true);
