@@ -1,5 +1,5 @@
 /* UMD.define */ (typeof define=="function"&&define||function(d,f,m){m={module:module,require:require};module.exports=f.apply(null,d.map(function(n){return m[n]||require(n)}))})
-(["./Micro", "./EventSource"], function(Micro, EventSource){
+(["./EventSource"], function(EventSource){
 	"use strict";
 
 	var Value = EventSource.Value, ErrorValue = EventSource.ErrorValue,
