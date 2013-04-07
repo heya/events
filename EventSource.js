@@ -11,7 +11,7 @@
 		this.sink = this.micro.sink;
 		this.micro.sink = makeSink(this);
 		if(!micro){
-			this.micro.callback = defaultCallback(this.micro);
+			this.micro.callback = makeDefaultCallback(this.micro);
 		}
 	}
 
@@ -100,7 +100,7 @@
 		}
 	}
 
-	function defaultCallback(micro){
+	function makeDefaultCallback(micro){
 		return function(val){
 			if(val instanceof Stop){
 				micro.release();
