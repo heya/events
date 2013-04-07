@@ -439,6 +439,77 @@ function(module, unit, EventStream){
 				{text: "send new value"},
 				{text: "callback 1: new value"}
 			]
+		},
+		{
+			test: function test_throw(t){
+				var a = new EventStream();
+				a.attach(function(value){
+					t.info("callback 1: " + value);
+					throw new Error(value + "-a");
+				}, function(value){
+					eval(t.TEST("value instanceof Error"));
+					t.info("errback 1: " + value.message);
+					return value.message + "-a";
+				}).attach(function(value){
+					t.info("callback 2: " + value);
+					return value + "-b";
+				}, function(value){
+					eval(t.TEST("value instanceof Error"));
+					t.info("errback 2: " + value.message);
+					return value.message + "-b";
+				}).attach(function(value){
+					t.info("callback 3: " + value);
+					return value + "-c";
+				}, function(value){
+					eval(t.TEST("value instanceof Error"));
+					t.info("errback 3: " + value.message);
+					return value.message + "-c";
+				});
+				t.info("send value");
+				a.send("value");
+				t.info("send error");
+				a.sendError(new Error("error"));
+			},
+			logs: [
+				{text: "send value"},
+				{text: "callback 1: value"},
+				{text: "errback 2: value-a"},
+				{text: "callback 3: value-a-b"},
+				{text: "send error"},
+				{text: "errback 1: error"},
+				{text: "callback 2: error-a"},
+				{text: "callback 3: error-a-b"}
+			]
+		},
+		{
+			timeout: 500,
+			test: function test_delay(t){
+				var a = new EventStream(), x = t.startAsync("async");
+				a.attach(function(value, sink){
+					t.info("callback 1: " + value);
+					setTimeout(function(){
+						sink.send(value + "-a");
+					}, 20);
+					return sink.noValue;
+				}).attach(function(value, sink){
+					t.info("callback 2: " + value);
+					setTimeout(function(){
+						sink.send(value + "-b");
+					}, 20);
+					return sink.noValue;
+				}).attach(function(value){
+					t.info("callback 3: " + value);
+					x.done();
+				});
+				t.info("send value");
+				a.send("value");
+			},
+			logs: [
+				{text: "send value"},
+				{text: "callback 1: value"},
+				{text: "callback 2: value-a"},
+				{text: "callback 3: value-a-b"}
+			]
 		}
 	]);
 
