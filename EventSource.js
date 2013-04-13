@@ -23,16 +23,16 @@
 
 	EventSource.prototype = {
 		declaredClass: "events/EventSource",
-		attach: function attach(channelName, callback, errback, stopback){
+		on: function on(channelName, callback, errback, stopback){
 			if(typeof channelName != "string"){
 				stopback = errback, errback = callback,
 				callback = channelName, channelName = "default";
 			}
 			if(callback instanceof EventSource){
-				this.micro.attach(channelName, callback.micro);
+				this.micro.on(channelName, callback.micro);
 				return callback;
 			}
-			var es = new EventSource(this.micro.attach(channelName));
+			var es = new EventSource(this.micro.on(channelName));
 			es.micro.callback = EventSource.makeMultiplexer(es, callback, errback, stopback);
 			return es;
 		},

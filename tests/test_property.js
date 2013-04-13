@@ -8,15 +8,15 @@ function(module, unit, PropertyStream){
 			test: function test_property(t){
 				var a = new PropertyStream();
 				t.info("attaching 1");
-				a.attach(function(value){ t.info("callback 1: " + value); });
+				a.on(function(value){ t.info("callback 1: " + value); });
 				t.info("sending value");
 				a.send("value");
 				t.info("attaching 2");
-				a.attach(function(value){ t.info("callback 2: " + value); });
+				a.on(function(value){ t.info("callback 2: " + value); });
 				t.info("sending another");
 				a.send("another");
 				t.info("attaching 3");
-				a.attach(function(value){ t.info("callback 3: " + value); });
+				a.on(function(value){ t.info("callback 3: " + value); });
 				t.info("sending new");
 				a.send("new");
 			},

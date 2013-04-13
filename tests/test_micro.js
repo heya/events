@@ -8,10 +8,10 @@ function(module, unit, Micro){
 		{
 			test: function test_attach(t){
 				var a = new Micro();
-				a.attach("default", function(value){
+				a.on("default", function(value){
 					t.info("callback 1: " + value);
 					return value + "-a";
-				}).attach("default", function(value){
+				}).on("default", function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -27,12 +27,12 @@ function(module, unit, Micro){
 		{
 			test: function test_attach_multi(t){
 				var a = new Micro();
-				a.attach("default", function(value, sink){
+				a.on("default", function(value, sink){
 					t.info("callback 1: " + value);
 					sink.send("default", "val1");
 					sink.send("default", "val2");
 					return value + "-a";
-				}).attach("default", function(value){
+				}).on("default", function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -50,10 +50,10 @@ function(module, unit, Micro){
 		{
 			test: function test_send_many(t){
 				var a = new Micro();
-				a.attach("default", function(value){
+				a.on("default", function(value){
 					t.info("callback 1: " + value);
 					return value + "-a";
-				}).attach("default", function(value){
+				}).on("default", function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -79,10 +79,10 @@ function(module, unit, Micro){
 		{
 			test: function test_noValue(t){
 				var a = new Micro();
-				a.attach("default", function(value, sink){
+				a.on("default", function(value, sink){
 					t.info("callback 1: " + value);
 					return sink.noValue;
-				}).attach("default", function(value){
+				}).on("default", function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -97,11 +97,11 @@ function(module, unit, Micro){
 		{
 			test: function test_release_b(t){
 				var a = new Micro(),
-					b = a.attach("default", function(value){
+					b = a.on("default", function(value){
 							t.info("callback 1: " + value);
 							return value + "-b";
 						});
-				b.attach("default", function(value){
+				b.on("default", function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -121,11 +121,11 @@ function(module, unit, Micro){
 		{
 			test: function test_release_c(t){
 				var a = new Micro(),
-					b = a.attach("default", function(value){
+					b = a.on("default", function(value){
 							t.info("callback 1: " + value);
 							return value + "-b";
 						}),
-					c = b.attach("default", function(value){
+					c = b.on("default", function(value){
 							t.info("callback 2: " + value);
 							return value + "-c";
 						});
@@ -146,26 +146,26 @@ function(module, unit, Micro){
 		{
 			test: function test_multichannel(t){
 				var a = new Micro(),
-					b = a.attach("default", function(value, sink){
+					b = a.on("default", function(value, sink){
 							t.info("callback 1: " + value);
 							sink.send("chan0", value + "-0");
 							sink.send("chan1", value + "-1");
 							sink.send("chan2", value + "-2");
 							return value + "-a";
 						});
-				b.attach("default", function(value){
+				b.on("default", function(value){
 					t.info("callback 2: " + value);
 					return value;
 				});
-				b.attach("chan0", function(value){
+				b.on("chan0", function(value){
 					t.info("chan0: " + value);
 					return value;
 				});
-				b.attach("chan1", function(value){
+				b.on("chan1", function(value){
 					t.info("chan1: " + value);
 					return value;
 				});
-				b.attach("chan2", function(value){
+				b.on("chan2", function(value){
 					t.info("chan2: " + value);
 					return value;
 				});

@@ -10,9 +10,9 @@
 	}
 	PropertyStream.prototype = Object.create(EventStream.prototype);
 
-	PropertyStream.prototype.attach = function attach(
+	PropertyStream.prototype.on = function on(
 				channelName, callback, errback, stopback){
-		var result = EventStream.prototype.attach.call(
+		var result = EventStream.prototype.on.call(
 				this, channelName, callback, errback, stopback);
 		if(typeof channelName != "string" ||
 				channelName == "default" && this.lastValue){

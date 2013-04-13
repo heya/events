@@ -8,10 +8,10 @@ function(module, unit, EventStream){
 		{
 			test: function test_attach(t){
 				var a = new EventStream();
-				a.attach(function(value){
+				a.on(function(value){
 					t.info("callback 1: " + value);
 					return value + "-a";
-				}).attach(function(value){
+				}).on(function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -27,12 +27,12 @@ function(module, unit, EventStream){
 		{
 			test: function test_attach_multi(t){
 				var a = new EventStream();
-				a.attach(function(value, sink){
+				a.on(function(value, sink){
 					t.info("callback 1: " + value);
 					sink.send("val1");
 					sink.send("val2");
 					return value + "-a";
-				}).attach(function(value){
+				}).on(function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -50,10 +50,10 @@ function(module, unit, EventStream){
 		{
 			test: function test_send_many(t){
 				var a = new EventStream();
-				a.attach(function(value){
+				a.on(function(value){
 					t.info("callback 1: " + value);
 					return value + "-a";
-				}).attach(function(value){
+				}).on(function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -79,10 +79,10 @@ function(module, unit, EventStream){
 		{
 			test: function test_noValue(t){
 				var a = new EventStream();
-				a.attach(function(value, sink){
+				a.on(function(value, sink){
 					t.info("callback 1: " + value);
 					return sink.noValue;
-				}).attach(function(value){
+				}).on(function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -97,11 +97,11 @@ function(module, unit, EventStream){
 		{
 			test: function test_release_b(t){
 				var a = new EventStream(),
-					b = a.attach(function(value){
+					b = a.on(function(value){
 							t.info("callback 1: " + value);
 							return value + "-b";
 						});
-				b.attach(function(value){
+				b.on(function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				});
@@ -121,11 +121,11 @@ function(module, unit, EventStream){
 		{
 			test: function test_release_c(t){
 				var a = new EventStream(),
-					b = a.attach(function(value){
+					b = a.on(function(value){
 							t.info("callback 1: " + value);
 							return value + "-b";
 						}),
-					c = b.attach(function(value){
+					c = b.on(function(value){
 							t.info("callback 2: " + value);
 							return value + "-c";
 						});
@@ -146,26 +146,26 @@ function(module, unit, EventStream){
 		{
 			test: function test_multichannel(t){
 				var a = new EventStream(),
-					b = a.attach(function(value, sink){
+					b = a.on(function(value, sink){
 							t.info("callback 1: " + value);
 							sink.sendToChannel("chan0", value + "-0");
 							sink.sendToChannel("chan1", value + "-1");
 							sink.sendToChannel("chan2", value + "-2");
 							return value + "-a";
 						});
-				b.attach(function(value){
+				b.on(function(value){
 					t.info("callback 2: " + value);
 					return value;
 				});
-				b.attach("chan0", function(value){
+				b.on("chan0", function(value){
 					t.info("chan0: " + value);
 					return value;
 				});
-				b.attach("chan1", function(value){
+				b.on("chan1", function(value){
 					t.info("chan1: " + value);
 					return value;
 				});
-				b.attach("chan2", function(value){
+				b.on("chan2", function(value){
 					t.info("chan2: " + value);
 					return value;
 				});
@@ -204,8 +204,8 @@ function(module, unit, EventStream){
 							t.info("callback 3: " + value);
 							return value + "-e";
 						});
-				a.attach(b);
-				a.attach("special", c);
+				a.on(b);
+				a.on("special", c);
 				t.info("sending value");
 				a.send("value");
 			},
@@ -220,18 +220,18 @@ function(module, unit, EventStream){
 		{
 			test: function test_errors(t){
 				var a = new EventStream();
-				a.attach(function(value){
+				a.on(function(value){
 					t.info("callback 1: " + value);
 					throw new Error(value + "-err");
 				}, function(value){
 					t.info("errback 1: " + value);
-				}).attach(function(value){
+				}).on(function(value){
 					t.info("callback 2: " + value);
 				}, function(value){
 					eval(t.TEST("value instanceof Error"));
 					t.info("errback 2: " + value.message);
 					return value.message + "-2";
-				}).attach(function(value){
+				}).on(function(value){
 					t.info("callback 3: " + value);
 				}, function(value){
 					t.info("errback 3: " + value);
@@ -260,8 +260,8 @@ function(module, unit, EventStream){
 						return value; // even
 					}),
 				even = [], odd = [];
-			a.attach(captureEventStream(even));
-			a.attach("odd", captureEventStream(odd));
+			a.on(captureEventStream(even));
+			a.on("odd", captureEventStream(odd));
 			for(var i = 0; i < 20; ++i){
 				a.send(i);
 			}
@@ -271,7 +271,7 @@ function(module, unit, EventStream){
 		{
 			test: function test_release_b_with_stop(t){
 				var a = new EventStream(),
-					b = a.attach(function(value){
+					b = a.on(function(value){
 							t.info("callback 1: " + value);
 							return value + "-b";
 						}, null, function(value){
@@ -279,7 +279,7 @@ function(module, unit, EventStream){
 							eval(t.TEST("value === b"));
 							return value;
 						});
-				b.attach(function(value){
+				b.on(function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				}, null, function(value){
@@ -305,14 +305,14 @@ function(module, unit, EventStream){
 		{
 			test: function test_release_c_with_stop(t){
 				var a = new EventStream(),
-					b = a.attach(function(value){
+					b = a.on(function(value){
 							t.info("callback 1: " + value);
 							return value + "-b";
 						}, null, function(value){
 							t.info("stopback 1");
 							return value;
 						}),
-					c = b.attach(function(value){
+					c = b.on(function(value){
 							t.info("callback 2: " + value);
 							return value + "-c";
 						}, null, function(value){
@@ -352,8 +352,8 @@ function(module, unit, EventStream){
 							t.info("stopback 2: " + value);
 							return value + "-c";
 						});
-				a.attach(b);
-				b.attach(c);
+				a.on(b);
+				b.on(c);
 				t.info("send value");
 				a.send("value");
 				t.info("stop a");
@@ -385,8 +385,8 @@ function(module, unit, EventStream){
 							t.info("stopback 2: " + value);
 							return value + "-c";
 						});
-				a.attach(b);
-				b.attach(c);
+				a.on(b);
+				b.on(c);
 				t.info("send value");
 				a.send("value");
 				t.info("stop b");
@@ -421,8 +421,8 @@ function(module, unit, EventStream){
 							t.info("stopback 2: " + value);
 							return value + "-c";
 						});
-				a.attach(b);
-				b.attach(c);
+				a.on(b);
+				b.on(c);
 				t.info("send value");
 				a.send("value");
 				t.info("stop c");
@@ -443,21 +443,21 @@ function(module, unit, EventStream){
 		{
 			test: function test_throw(t){
 				var a = new EventStream();
-				a.attach(function(value){
+				a.on(function(value){
 					t.info("callback 1: " + value);
 					throw new Error(value + "-a");
 				}, function(value){
 					eval(t.TEST("value instanceof Error"));
 					t.info("errback 1: " + value.message);
 					return value.message + "-a";
-				}).attach(function(value){
+				}).on(function(value){
 					t.info("callback 2: " + value);
 					return value + "-b";
 				}, function(value){
 					eval(t.TEST("value instanceof Error"));
 					t.info("errback 2: " + value.message);
 					return value.message + "-b";
-				}).attach(function(value){
+				}).on(function(value){
 					t.info("callback 3: " + value);
 					return value + "-c";
 				}, function(value){
@@ -485,19 +485,19 @@ function(module, unit, EventStream){
 			timeout: 500,
 			test: function test_delay(t){
 				var a = new EventStream(), x = t.startAsync("async");
-				a.attach(function(value, sink){
+				a.on(function(value, sink){
 					t.info("callback 1: " + value);
 					setTimeout(function(){
 						sink.send(value + "-a");
 					}, 20);
 					return sink.noValue;
-				}).attach(function(value, sink){
+				}).on(function(value, sink){
 					t.info("callback 2: " + value);
 					setTimeout(function(){
 						sink.send(value + "-b");
 					}, 20);
 					return sink.noValue;
-				}).attach(function(value){
+				}).on(function(value){
 					t.info("callback 3: " + value);
 					x.done();
 				});

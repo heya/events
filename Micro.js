@@ -17,7 +17,7 @@
 	Micro.prototype = {
 		declaredClass: "events/Micro",
 		noValue: noValue,
-		attach: function attach(channelName, callback){
+		on: function on(channelName, callback){
 			var micro = callback instanceof Micro ? callback : new Micro(callback);
 			ice.assert(!micro.parentChannel, "Source cannot be attached twice");
 			if(this.channels.hasOwnProperty(channelName)){
