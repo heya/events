@@ -45,6 +45,20 @@
 					this.sink.send(ch, value, true);
 				}
 			}
+		},
+		// pipe-like methods
+		forEach: function forEach(f){
+			return this.on(function(value){ f(value); return value; });
+		},
+		map: function map(f){
+			return this.on(f);
+		},
+		filter: function filter(f){
+			return this.on(function(value, sink){ return f(value) ? value : sink.noValue; });
+		},
+		scan: function scan(f, init){
+			// the next assignment is intentional
+			return this.on(function(value){ return init = f(init, value); });
 		}
 	};
 
