@@ -10,10 +10,12 @@
 			require.config({
 				baseUrl: ".",
 				packages: [
+					{name: "dcl", main: "dcl",
+					location: "../node_modules/dcl"},
 					{name: "heya-unit",
 					location: "../node_modules/heya-unit"},
 					{name: "heya-ice",
-					location: "../node_modules/heya-ice"},
+					location: "../node_modules/heya-unit/node_modules/heya-ice"},
 					{name: "heya-unify",
 					location: "../node_modules/heya-unit/node_modules/heya-unify"}
 				],

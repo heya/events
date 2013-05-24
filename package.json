@@ -6,7 +6,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "heya-ice": ">=0.1"
+    "dcl": ">=1.0"
   },
   "devDependencies": {
     "heya-unit": ">=0.1"
