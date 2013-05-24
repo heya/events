@@ -1,13 +1,12 @@
 /* UMD.define */ (typeof define=="function"&&define||function(d,f,m){m={module:module,require:require};module.exports=f.apply(null,d.map(function(n){return m[n]||require(n)}))})
-(["module", "heya-ice/assert"], function(module, ice){
+([], function(){
 	"use strict";
-
-	ice = ice.specialize(module);
 
 	var noValue = {};
 
 	function Micro(callback){
 		this.channels = {};
+		this.parent = [];
 		this.callback = callback || function identity(x){ return x; };
 		this.sink = makeSink(this);
 	}
@@ -19,13 +18,12 @@
 		noValue: noValue,
 		on: function on(channelName, callback){
 			var micro = callback instanceof Micro ? callback : new Micro(callback);
-			ice.assert(!micro.parentChannel, "Source cannot be attached twice");
 			if(this.channels.hasOwnProperty(channelName)){
 				this.channels[channelName].push(micro);
 			}else{
 				this.channels[channelName] = [micro];
 			}
-			micro.parentChannel = this.channels[channelName];
+			micro.parent.push(this.channels[channelName]);
 			return micro;
 		},
 		send: function send(value, copy){
@@ -43,11 +41,11 @@
 			}
 		},
 		release: function release(){
-			if(this.parentChannel){
-				var i = this.parentChannel.indexOf(this);
-				this.parentChannel.splice(i, 1);
-				delete this.parentChannel;
-			}
+			this.parent.forEach(function(parent){
+				var i = parent.indexOf(this);
+				parent.splice(i, 1);
+			});
+			this.parent = [];
 		}
 	};
 
