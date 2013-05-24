@@ -7,7 +7,7 @@
 	function Stop(x){ this.x = x; }
 
 	function EventSource(micro){
-		this.micro = micro || new Micro();
+		this.micro = micro instanceof Micro ? micro : new Micro();
 		this.sink = this.micro.sink;
 		this.micro.sink = makeSink(this);
 		if(!micro){
