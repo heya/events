@@ -1,4 +1,4 @@
-# Events [![Build Status](https://travis-ci.org/heya/events.png?branch=master)](https://travis-ci.org/heya/events)
+# Events [![Build Status](https://travis-ci.org/heya/events.png?branch=master)](https://travis-ci.org/heya/events) [![Greenkeeper badge](https://badges.greenkeeper.io/heya/events.svg)](https://greenkeeper.io/)
 
 Events.
 
