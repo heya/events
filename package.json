@@ -6,13 +6,20 @@
     "test": "tests"
   },
   "dependencies": {
-    "dcl": ">=1.0"
+    "dcl": "2.0.9"
   },
   "devDependencies": {
-    "heya-unit": ">=0.1"
+    "express": "^4.17.1",
+    "heya-unit": "0.3.0",
+    "puppeteer": "^2.0.0",
+    "puppeteer-firefox": "^0.5.0"
   },
   "scripts": {
-    "test": "node tests/tests.js"
+    "test": "node tests/tests.js",
+    "start": "node tests/server.js",
+    "test-chrome": "node tests/puppeteer-chrome.js",
+    "test-firefox": "node tests/puppeteer-firefox.js",
+    "test-browser": "npm run test-chrome && npm run test-firefox"
   },
   "repository": {
     "type": "git",
