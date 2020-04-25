@@ -26,6 +26,7 @@ volo install heya/events heya-events
 
 ## Versions
 
+- 0.1.4 *Refreshed deps.*
 - 0.1.3 *Refreshed deps.*
 
 [npm-image]:         https://img.shields.io/npm/v/heya-events.svg
