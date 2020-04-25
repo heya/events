@@ -9,7 +9,7 @@ node_js:
   - "8"
   - "10"
   - "12"
-  - "13"
+  - "14"
 
 env:
   - BROWSER=true
@@ -27,6 +27,6 @@ matrix:
 before_script:
   - npm start &
   - sleep 5
-  - if [ "$BROWSER" == "true" ]; then export RUN_TEST="npm run test-browser"; else export RUN_TEST="npm test"; fi
+  - if [ "$BROWSER" == "true" ]; then export RUN_TEST="npm run test-firefox"; else export RUN_TEST="npm test"; fi
 
 script: $RUN_TEST
