@@ -11,7 +11,7 @@
   "devDependencies": {
     "express": "^4.17.1",
     "heya-unit": "0.3.0",
-    "puppeteer": "^3.0.1",
+    "puppeteer": "^3.0.3",
     "puppeteer-firefox": "^0.5.1"
   },
   "scripts": {
